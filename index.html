@@ -1,0 +1,37 @@
+<script src="livescript.js"></script>
+<a href="#" id="toggle">Start/Stop</a>
+<script type="text/ls">
+
+randomHarmonic = ({root=220}={}) ->
+	wl = 1.0/root
+	overtone = wl/Math.ceil(Math.random!*12)
+	return 1.0/overtone
+
+randomHarmony = (n=20) ->
+	ctx = new AudioContext!
+	for i from 0 til n
+		oscillator = ctx.createOscillator!
+		oscillator.type = "sine"
+		oscillator.frequency.value = randomHarmonic!
+		gain = ctx.createGain!
+		gain.gain.value = 1/n
+		oscillator.connect gain
+		gain.connect ctx.destination
+		oscillator.start()
+	return ctx
+
+ctx = void
+document.getElementById("toggle").onclick = ->
+	if ctx?
+		ctx.close()
+		ctx := void
+		return
+	
+	ctx := randomHarmony!
+
+</script>
+
+<script>
+    var LiveScript = require("LiveScript");
+    LiveScript.go();
+</script>
