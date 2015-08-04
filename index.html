@@ -4,11 +4,12 @@
 
 randomHarmonic = ({root=220}={}) ->
 	wl = 1.0/root
-	overtone = wl/Math.ceil(Math.random!*12)
+	overtone = wl/Math.ceil(Math.random!**3*12)
 	return 1.0/overtone
 
-randomHarmony = (n=20) ->
+randomHarmony = (n=100) ->
 	ctx = new AudioContext!
+	rndcoord = -> (Math.random()-0.5)*10
 	for i from 0 til n
 		oscillator = ctx.createOscillator!
 		oscillator.type = "sine"
@@ -16,7 +17,10 @@ randomHarmony = (n=20) ->
 		gain = ctx.createGain!
 		gain.gain.value = 1/n
 		oscillator.connect gain
-		gain.connect ctx.destination
+		panner = ctx.createPanner()
+		panner.setPosition rndcoord!, rndcoord!, 0
+		gain.connect panner
+		panner.connect ctx.destination
 		oscillator.start()
 	return ctx
 
