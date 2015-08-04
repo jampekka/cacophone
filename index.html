@@ -1,5 +1,29 @@
 <script src="livescript.js"></script>
-<a href="#" id="toggle">Start/Stop</a>
+<script src="jquery-2.1.4.js"></script>
+
+<style type="text/css">
+body, html {
+	margin: 0;
+	padding: 0;
+}
+#area {
+	background-color: black;
+	width: 100%;
+	height: 100%;
+	position: fixed;
+}
+
+.marker {
+	position: absolute;
+	width: 0;
+	height: 0;
+	padding: 10px;
+	background-color: white;
+}
+</style>
+
+<div style="" id="area"></div>
+<button id="toggle" style="display: inline-block; z-index: 10; position: fixed;">Start/Stop</button>
 <script type="text/ls">
 
 randomHarmonic = ({root=220}={}) ->
@@ -11,8 +35,15 @@ randomHarmonic = ({root=220}={}) ->
 	return root*2**(cents/1200)
 
 randomHarmony = (n=10) ->
+	area = $ '#area'
+	area.empty()
+
+
 	ctx = new AudioContext!
-	rndcoord = -> (Math.random()-0.5)*10
+	
+	size = 10
+
+	rndcoord = -> (Math.random())*size
 	for i from 0 til n
 		oscillator = ctx.createOscillator!
 		oscillator.type = "sine"
@@ -21,22 +52,47 @@ randomHarmony = (n=10) ->
 		gain.gain.value = 1/n
 		oscillator.connect gain
 		panner = ctx.createPanner()
-		panner.setPosition rndcoord!, rndcoord!, 0
+		panner.coneInnerAngle = 360
+		x = rndcoord!
+		y = rndcoord!
+		panner.setPosition x, y, 0
+		marker = $('<div class="marker">')
+		.appendTo area
+		.css do
+			left: "#{x/size*100}%"
+			bottom: "#{y/size*100}%"
 		gain.connect panner
 		panner.connect ctx.destination
 		oscillator.start()
+	
+	target = $ '<div class="marker" style="background-color: red; z-index: 20">'
+	.appendTo area
 
+	reposition = (x=0, y=0, z=0) ->
+		target.css do
+			left: "#{x/size*100}%"
+			bottom: "#{y/size*100}%"
+		ctx.listener.setPosition x, y, z
+	reposition()
+
+	area.mousemove (e) ->
+		return false if ctx.state == 'closed'
+		x = e.pageX/window.innerWidth
+		y = 1 - e.pageY/window.innerHeight
+		reposition x*size, y*size
+		
+	
 	dt = 1/60
 	x = 0
 	v = 5
-	move = ->
-		return false if ctx.state == 'closed'
-		if Math.abs(x) > 10
-			v *= -1
-		x += v*dt
-		ctx.listener.setPosition x, 0, 0
-
-	setInterval move, dt*1000
+	#move = ->
+	#	return false if ctx.state == 'closed'
+	#	if x < 0 or x > size
+	#		v *= -1
+	#	x += v*dt
+	#	reposition x, 0, 0
+	#
+	#setInterval move, dt*1000
 
 	return ctx
 
