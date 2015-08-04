@@ -22,6 +22,20 @@ randomHarmony = (n=100) ->
 		gain.connect panner
 		panner.connect ctx.destination
 		oscillator.start()
+
+	dt = 1/60
+	x = 0
+	v = 5
+	move = ->
+		return false if ctx.state == 'closed'
+		if Math.abs(x) > 10
+			v *= -1
+		x += v*dt
+		console.log x
+		ctx.listener.setPosition x, 0, 0
+
+	setInterval move, dt*1000
+
 	return ctx
 
 ctx = void
