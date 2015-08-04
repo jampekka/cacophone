@@ -3,11 +3,14 @@
 <script type="text/ls">
 
 randomHarmonic = ({root=220}={}) ->
-	wl = 1.0/root
-	overtone = wl/Math.ceil(Math.random!**3*12)
-	return 1.0/overtone
+	#wl = 1.0/root
+	#overtone = wl/Math.ceil(Math.random!**2*7)
+	#return 1.0/overtone
+	nTones = Math.ceil(Math.random!*6)
+	cents = 100*nTones*2
+	return root*2**(cents/1200)
 
-randomHarmony = (n=100) ->
+randomHarmony = (n=10) ->
 	ctx = new AudioContext!
 	rndcoord = -> (Math.random()-0.5)*10
 	for i from 0 til n
