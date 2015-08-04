@@ -31,7 +31,6 @@ randomHarmony = (n=100) ->
 		if Math.abs(x) > 10
 			v *= -1
 		x += v*dt
-		console.log x
 		ctx.listener.setPosition x, 0, 0
 
 	setInterval move, dt*1000
